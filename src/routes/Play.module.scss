@@ -3,8 +3,6 @@
 .section {
   height: inherit;
   background-color: var(--color-primary);
-  padding: 0 1rem;
-  // padding-top: 20rem;
 
   button {
     display: flex;
@@ -109,8 +107,6 @@
   }
 }
 
-
-
 header {
   position: fixed;
   left: 0;
@@ -119,19 +115,6 @@ header {
   display: flex;
   justify-content: space-between;
 
-  > div {
-    background-color: #082323;
-    width: 4rem;
-    height: 1rem;
-    padding: 1rem 2rem;
-    border-radius: .4rem;
-    outline: .4rem solid rgba(0, 0, 0, 0.1);
-    color: #fff;
-    span {
-      margin-left: auto;
-      
-    }
-  }
 }
 
 .container {
@@ -139,22 +122,26 @@ header {
   min-height: 100vh;
   background-color: #599268;
   user-select: none;
-  background-image: url('./assets/leaf.svg');
+  background-image: url('./../assets/leaf.svg');
   background-repeat: no-repeat;
   background-position: bottom center;
 }
 
+.header {
+  padding: 1rem 1rem;
+}
+
 .score {
-  background-image: url('./assets/coin.svg');
-  background-repeat: no-repeat;
-  background-position: 1rem center;
-  background-size: 25%;
   display: flex;
   flex-direction: row;
   align-items: center;
+  column-gap: 1rem;
+  color: var(--white);
 
-
-
+  figure {
+    border:1px solid red;
+    width: 100px;
+  }
 }
 
 .tongue {
@@ -189,8 +176,7 @@ header {
 
 .fly {
   position: absolute;
-  width: 75px;
-
+  width: 45px;
   //animation-name: fly;
   animation-duration: 3s;
   animation-delay: 0.5s;
@@ -208,5 +194,15 @@ header {
   text-align: center;
   transform: translate(-50%);
   width: 20vw;
-  
+
+  &:after {
+    content: '';
+    background-image: url('./assets/lotus.svg');
+    background-repeat: no-repeat;
+    background-position: 1rem center;
+    background-size: 25%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 }

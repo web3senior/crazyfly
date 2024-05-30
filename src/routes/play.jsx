@@ -12,6 +12,7 @@ import Web3 from 'web3'
 import ABI from '../abi/luckybet.json'
 import party from 'party-js'
 import Efrog from './../assets/frog.svg'
+import Coin from './../assets/coin.svg'
 import Fly from './../assets/insect.png'
 import Leaf from './../assets/leaf.svg'
 import clickSounds from './../assets/sounds/click.wav'
@@ -163,7 +164,11 @@ function Play({ title }) {
     }
 
     document.onmousemove = (e) => handleMouseMove(e, tongue, tongueProperty)
-    document.onmousedown = (e) => handleTongue(e)
+        document.ontouchmove = (e) => handleMouseMove(e, tongue, tongueProperty)
+    
+        document.onmousedown = (e) => handleTongue(e)
+    document.ontouchstart = (e) => handleTongue(e)
+    
     document.onmouseup = (e) => handleTongueBack(e)
 
     let counter = 0
@@ -196,18 +201,21 @@ function Play({ title }) {
       <section className={`${styles.section} s-motion-slideUpIn`}>
       {keyframe && <style>{keyframe}</style>}
 
-        <div id={`container`} className={`__container ${styles.container}`} data-width={`medium`}>
+        <div id={`container`} className={`__container ${styles.container}`} data-width={`xxlarge`}>
       
     
-        <header className="d-flex flex-row align-items-center justify-content-between">
-          <div className={`score`}>
-            <span>{score}</span>
-          </div>
+        <div className={`${styles.header} d-flex flex-row align-items-center justify-content-between`}>
+        
+          <figure className={`${styles.score}`}>
+            <img className={styles.coin} src={Coin} draggable={`false`} />
+            <figcaption>{score}</figcaption>
+          </figure>
+          
 
           <div className={styles.timer}>
             <span>{timer}</span>.<small className="milisecond">{0}</small>
           </div>
-        </header>
+        </div>
 
   
          
