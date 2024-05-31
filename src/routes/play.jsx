@@ -36,7 +36,7 @@ function Play({ title }) {
   const params = useParams()
 
   let score = 0
-  let timer = 5
+  let timer = 30
   let milisecond = 1_000
   let tongue = useRef(null)
   var vw = window.innerWidth
@@ -95,9 +95,6 @@ function Play({ title }) {
         insect.remove()
         playWetTongue()
       }
-      // } else {
-      //   playThrowTongue()
-      // }
     })
   }
 

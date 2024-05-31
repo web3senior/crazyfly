@@ -22,13 +22,12 @@
     }
   }
 
-
   h1 {
     color: var(--black);
     text-align: center;
     font-size: 4.5vw;
     @include small-up() {
-      font-size: 1.5vw;
+      font-size: 3.5vw;
     }
   }
 }
