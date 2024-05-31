@@ -49,13 +49,13 @@ function Play({ title }) {
   }
 
   function handleMouseMove(event, tongue, tongueProperty) {
+    console.log(event)
     let mouse = {
-      x: event.pageX,
-      y: event.pageY,
+      x: event.touches ? event.touches[0].clientX : event.pageX,
+      y: event.touches ? event.touches[0].clientY : event.pageY,
     }
     let dx = mouse.x - tongueProperty.cx
     let dy = mouse.y - tongueProperty.cy
-
 
     let transform = `rotate(${Math.atan2(dy, dx)}rad)`
     document.querySelector(`#tongue`).style.transform = transform
@@ -63,17 +63,14 @@ function Play({ title }) {
 
   const handleTongue = (event) => {
     // console.log(event.touches ? true:false)
-  
-
     let tongue = document.querySelector(`#tongue`)
     let mouse = {
-      x: event.touches ? event.touches[0].clientX: event.pageX,
-      y: event.touches ? event.touches[0].clientY: event.pageY,
+      x: event.touches ? event.touches[0].clientX : event.pageX,
+      y: event.touches ? event.touches[0].clientY : event.pageY,
     }
     let a = mouse.x - tongue.offsetLeft
     let b = mouse.y - tongue.offsetTop
     let c = Math.sqrt(a * a + b * b)
-
 
     //document.querySelector('#tongue').style.width = `${c}px`
     console.log(`setting property`)
@@ -105,11 +102,10 @@ function Play({ title }) {
   const handleTongueBack = (event) => {
     console.log(event)
     document.querySelector('#tongue').style.setProperty('--tongue-width', `${0}px`)
-   //document.querySelector(`#tongue`).style.width = `0`
-   document.querySelector(`#tongue`).classList.remove(styles.throwTongue)
-   document.querySelector(`#tongue`).classList.add(styles.HidethrowTongue)
-   //document.querySelector('#tongue').style.width="0px"
-
+    //document.querySelector(`#tongue`).style.width = `0`
+    document.querySelector(`#tongue`).classList.remove(styles.throwTongue)
+    document.querySelector(`#tongue`).classList.add(styles.HidethrowTongue)
+    //document.querySelector('#tongue').style.width="0px"
   }
 
   const addFly = (count) => {
@@ -177,19 +173,19 @@ function Play({ title }) {
     }
 
     document.onmousemove = (e) => handleMouseMove(e, tongue, tongueProperty)
-   document.ontouchmove = (e) => handleMouseMove(e, tongue, tongueProperty)
+    document.ontouchmove = (e) => handleMouseMove(e, tongue, tongueProperty)
 
-   document.onmousedown = (e) => handleTongue(e)
-   document.ontouchstart = (e) => handleTongue(e)
+    document.onmousedown = (e) => handleTongue(e)
+    document.ontouchstart = (e) => handleTongue(e)
 
-   document.onmouseup = (e) => handleTongueBack(e)
+    document.onmouseup = (e) => handleTongueBack(e)
     document.ontouchcancel = (e) => handleTongueBack(e)
 
-  //   document.addEventListener("touchstart", (e) => {
-  //     handleTongue(e)
-  //     console.log(`Touch Started =>`)
-  //     // do something
-  //  }, false);
+    //   document.addEventListener("touchstart", (e) => {
+    //     handleTongue(e)
+    //     console.log(`Touch Started =>`)
+    //     // do something
+    //  }, false);
 
     let counter = 0
     window.setInterval(() => {
