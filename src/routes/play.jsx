@@ -56,21 +56,30 @@ function Play({ title }) {
     let dx = mouse.x - tongueProperty.cx
     let dy = mouse.y - tongueProperty.cy
 
+
     let transform = `rotate(${Math.atan2(dy, dx)}rad)`
     document.querySelector(`#tongue`).style.transform = transform
   }
 
   const handleTongue = (event) => {
+    // console.log(event.touches ? true:false)
+  
+
     let tongue = document.querySelector(`#tongue`)
     let mouse = {
-      x: event.pageX,
-      y: event.pageY,
+      x: event.touches ? event.touches[0].clientX: event.pageX,
+      y: event.touches ? event.touches[0].clientY: event.pageY,
     }
     let a = mouse.x - tongue.offsetLeft
     let b = mouse.y - tongue.offsetTop
     let c = Math.sqrt(a * a + b * b)
 
-    document.querySelector(':root').style.setProperty('--width', `${c}px`)
+
+    //document.querySelector('#tongue').style.width = `${c}px`
+    console.log(`setting property`)
+    //document.querySelector('#tongue').style.width = `${c}px`
+    document.querySelector('#tongue').style.setProperty('--tongue-width', `${c}px`)
+    document.querySelector(`#tongue`).classList.remove(styles.HidethrowTongue)
     document.querySelector(`#tongue`).classList.add(styles.throwTongue)
     // document.querySelector(`.tongue`).style.top = `${e.offsetY}px`
     // document.querySelector(`.tongue`).style.left = `${e.offsetX}px`
@@ -82,21 +91,25 @@ function Play({ title }) {
       let insectRight = insectLeft + insect.offsetWidth
       let insectBottom = insectTop + insect.offsetHeight
 
-      console.log(mouse.x >= insectLeft, mouse.x <= insectRight, mouse.y >= insectTop, mouse.y <= insectBottom)
       if (mouse.x >= insectLeft && mouse.x <= insectRight && mouse.y >= insectTop && mouse.y <= insectBottom) {
         setScore((score) => score + 1)
         insect.remove()
         playWetTongue()
-      } else {
-        playThrowTongue()
       }
+      // } else {
+      //   playThrowTongue()
+      // }
     })
   }
 
   const handleTongueBack = (event) => {
-    document.querySelector(`#tongue`).classList.remove(styles.throwTongue)
-    // document.querySelector(`.tongue`).style.top = `${e.offsetY}px`
-    // document.querySelector(`.tongue`).style.left = `${e.offsetX}px`
+    console.log(event)
+    document.querySelector('#tongue').style.setProperty('--tongue-width', `${0}px`)
+   //document.querySelector(`#tongue`).style.width = `0`
+   document.querySelector(`#tongue`).classList.remove(styles.throwTongue)
+   document.querySelector(`#tongue`).classList.add(styles.HidethrowTongue)
+   //document.querySelector('#tongue').style.width="0px"
+
   }
 
   const addFly = (count) => {
@@ -105,7 +118,7 @@ function Play({ title }) {
     for (let i = 0; i < count; i++) {
       const img = document.createElement('img')
       img.src = Fly
-      img.id=`fly`
+      img.id = `fly`
       img.classList.add(styles.fly, `fly${i}`)
       img.style.animationName = `fly${i}`
       img.style.left = `${getRandomInt(100)}%`
@@ -117,11 +130,11 @@ function Play({ title }) {
 
       keyframes.push(`
 @keyframes fly${i} {
-  0%   {left:${getRandomInt(100)}%; top:${getRandomInt(50)}%;}
-  25%  {left:${getRandomInt(100)}%; top:${getRandomInt(50)}%;}
-  50%  {left:${getRandomInt(100)}%; top:${getRandomInt(50)}%;}
-  75%  {left:${getRandomInt(100)}%; top:${getRandomInt(50)}%;}
-  100% {left:${getRandomInt(100)}%; top:${getRandomInt(50)}%;}
+  0%   {left:${getRandomInt(100)}%; top:${getRandomInt(80)}%;}
+  25%  {left:${getRandomInt(100)}%; top:${getRandomInt(80)}%;}
+  50%  {left:${getRandomInt(100)}%; top:${getRandomInt(80)}%;}
+  75%  {left:${getRandomInt(100)}%; top:${getRandomInt(80)}%;}
+  100% {left:${getRandomInt(100)}%; top:${getRandomInt(80)}%;}
 }
 `)
     }
@@ -146,7 +159,7 @@ function Play({ title }) {
   }
 
   useEffect(() => {
-    addFly(20)
+    addFly(1)
 
     let width = 100
     let height = 4
@@ -164,12 +177,19 @@ function Play({ title }) {
     }
 
     document.onmousemove = (e) => handleMouseMove(e, tongue, tongueProperty)
-        document.ontouchmove = (e) => handleMouseMove(e, tongue, tongueProperty)
-    
-        document.onmousedown = (e) => handleTongue(e)
-    document.ontouchstart = (e) => handleTongue(e)
-    
-    document.onmouseup = (e) => handleTongueBack(e)
+   document.ontouchmove = (e) => handleMouseMove(e, tongue, tongueProperty)
+
+   document.onmousedown = (e) => handleTongue(e)
+   document.ontouchstart = (e) => handleTongue(e)
+
+   document.onmouseup = (e) => handleTongueBack(e)
+    document.ontouchcancel = (e) => handleTongueBack(e)
+
+  //   document.addEventListener("touchstart", (e) => {
+  //     handleTongue(e)
+  //     console.log(`Touch Started =>`)
+  //     // do something
+  //  }, false);
 
     let counter = 0
     window.setInterval(() => {
@@ -199,32 +219,25 @@ function Play({ title }) {
   return (
     <>
       <section className={`${styles.section} s-motion-slideUpIn`}>
-      {keyframe && <style>{keyframe}</style>}
+        {keyframe && <style>{keyframe}</style>}
 
         <div id={`container`} className={`__container ${styles.container}`} data-width={`xxlarge`}>
-      
-    
-        <div className={`${styles.header} d-flex flex-row align-items-center justify-content-between`}>
-        
-          <figure className={`${styles.score}`}>
-            <img className={styles.coin} src={Coin} draggable={`false`} />
-            <figcaption>{score}</figcaption>
-          </figure>
-          
+          <div className={`${styles.header} d-flex flex-row align-items-center justify-content-between`}>
+            <figure className={`${styles.score}`}>
+              <img className={styles.coin} src={Coin} draggable={`false`} />
+              <figcaption>{score}</figcaption>
+            </figure>
 
-          <div className={styles.timer}>
-            <span>{timer}</span>.<small className="milisecond">{0}</small>
+            <div className={styles.timer}>
+              <span>{timer}</span>.<small className="milisecond">{0}</small>
+            </div>
           </div>
-        </div>
 
-  
-         
           <div id={`tongue`} className={styles.tongue}></div>
           <figure>
             <img className={styles.frog} src={Efrog} draggable={`false`} />
           </figure>
-      
-          </div>
+        </div>
         <ul className={`${styles.nav} d-flex`}>
           <li
             onClick={() => {
@@ -236,21 +249,6 @@ function Play({ title }) {
             onClick={() => {
               playClick()
               navigate(`/pools`)
-            }}
-          />
-          <li
-            onClick={() => {
-              playClick()
-            }}
-          />
-          <li
-            onClick={() => {
-              playClick()
-            }}
-          />
-          <li
-            onClick={() => {
-              playClick()
             }}
           />
           <li
