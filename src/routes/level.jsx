@@ -199,9 +199,9 @@ function Pools({ title }) {
       <section className={styles.section}>
         <div className={`__container h-inherit d-flex flex-column align-items-center justify-content-center`} data-width={`large`}>
           <div className={`d-flex flex-column align-items-center justify-content-center mt-10`}>
-            {pools.map((item) => {
+            {pools.map((item, i) => {
               return (
-                <Link to={`/play/0x0000000000000000000000000000000000000000000000000000000000000001`}>
+                <Link to={`/play/0x0000000000000000000000000000000000000000000000000000000000000001`} key={i} style={{ opacity: i === 0 ? 1 : 0.4 }}>
                   <button>{item.name}</button>
                 </Link>
               )

@@ -3,18 +3,17 @@
 .section {
   height: inherit;
   user-select: none;
-
-background: #86CDBF;
-
+  background: #86cdbf;
   overflow: hidden;
   padding: 1rem 0;
+  
   @include small-down() {
     //background: #fd1669;
   }
 
   .logo {
     padding: 0 1rem;
-    
+
     figure {
       &:first-child {
         img {
@@ -29,7 +28,7 @@ background: #86CDBF;
   }
 
   nav {
-    row-gap: .5rem;
+    row-gap: 0.5rem;
   }
 
   a {

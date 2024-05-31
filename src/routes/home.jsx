@@ -242,7 +242,8 @@ Catch flies, collect NFTs, and enjoy the fun and rewarding gameplay.
 
         <div className={`__container h-inherit d-flex flex-column align-items-center justify-content-center`} data-width={`large`}>
           <nav className={`d-flex flex-column align-items-center justify-content-center`}>
-            <button onClick={() => navigate(`/level`)}>Play</button>
+          <button onClick={() => auth.connectWallet()}>Connect</button>
+          <button onClick={() => navigate(`/level`)}>Play</button>
             <button onClick={() => handleShowModal('rules')}>Rules</button>
             <button onClick={() => handleShowModal('guide')}>Guide</button>
             <button onClick={() => handleShowModal('about')}>About</button>

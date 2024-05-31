@@ -28,16 +28,15 @@ export const loader = async ({ request, params }) => {
 function Play({ title }) {
   Title(title)
   const [isLoading, setIsLoading] = useState(true)
-  const [app, setApp] = useState([])
-  const [manager, setManager] = useState()
-  const [like, setLike] = useState(0)
+  const [gameover, setGameover] = useState(false)
+  // const [score, setScore] = useState(0)
+  const [keyframe, setKeyframe] = useState()
   const auth = useAuth()
   const navigate = useNavigate()
   const params = useParams()
 
-  const [timer, setTimer] = useState(0)
-  const [score, setScore] = useState(0)
-  const [keyframe, setKeyframe] = useState()
+  let score = 0
+  let timer = 5
   let milisecond = 1_000
   let tongue = useRef(null)
   var vw = window.innerWidth
@@ -49,7 +48,6 @@ function Play({ title }) {
   }
 
   function handleMouseMove(event, tongue, tongueProperty) {
-    console.log(event)
     let mouse = {
       x: event.touches ? event.touches[0].clientX : event.pageX,
       y: event.touches ? event.touches[0].clientY : event.pageY,
@@ -62,7 +60,7 @@ function Play({ title }) {
   }
 
   const handleTongue = (event, tongueProperty) => {
-    handleMouseMove(event,'',tongueProperty)
+    handleMouseMove(event, '', tongueProperty)
     // console.log(event.touches ? true:false)
     let tongue = document.querySelector(`#tongue`)
     let mouse = {
@@ -90,7 +88,10 @@ function Play({ title }) {
       let insectBottom = insectTop + insect.offsetHeight
 
       if (mouse.x >= insectLeft && mouse.x <= insectRight && mouse.y >= insectTop && mouse.y <= insectBottom) {
-        setScore((score) => score + 1)
+        //setScore((score) => score + 1)
+        score++
+        document.querySelector(`.score-input`).value = score
+        document.querySelector(`.score`).innerHTML = score
         insect.remove()
         playWetTongue()
       }
@@ -155,8 +156,16 @@ function Play({ title }) {
     }
   }
 
+  const playClick = () => {
+    var audio = new Audio(clickSounds)
+    audio.play()
+    if ('vibrate' in navigator) {
+      navigator.vibrate(200)
+    }
+  }
+
   useEffect(() => {
-    addFly(1)
+    addFly(50)
 
     let width = 100
     let height = 4
@@ -179,78 +188,49 @@ function Play({ title }) {
     document.onmouseup = (e) => handleTongueBack(e, tongueProperty)
     document.ontouchcancel = (e) => handleTongueBack(e, tongueProperty)
 
-    //   document.addEventListener("touchstart", (e) => {
-    //     handleTongue(e)
-    //     console.log(`Touch Started =>`)
-    //     // do something
-    //  }, false);
-
-    let counter = 0
-    window.setInterval(() => {
-      document.querySelector(`.milisecond`).innerText = counter
-      if (counter > milisecond) {
-        counter = 0
-        setTimer((timer) => timer + 1)
-      }
-      counter++
-    }, 0)
-
-    // window.setInterval(() => {
-    //
-    // }, milisecond)
-  }, [milisecond])
-
-  const playClick = () => {
-    var audio = new Audio(clickSounds)
-    audio.play()
-    if ('vibrate' in navigator) {
-      navigator.vibrate(200)
+    const showScore = () => {
+      setGameover(true)
+      alert(`Your Score: ${document.querySelector(`.score-input`).value}`)
+      window.location.href = `../`
     }
-  }
 
-  useEffect(() => {}, [])
+    const Interval = window.setInterval(() => {
+      console.log(timer)
+      if (timer === 0) {
+        showScore()
+        // clearInterval(Interval)
+      }
+      timer -= 1
+      document.querySelector(`.${styles.timer} span`).innerHTML = timer
+    }, milisecond)
+  }, [])
 
   return (
     <>
       <section className={`${styles.section} s-motion-slideUpIn`}>
         {keyframe && <style>{keyframe}</style>}
+        <input className="score-input" type="hidden" value={0} />
 
         <div id={`container`} className={`__container ${styles.container}`} data-width={`xxlarge`}>
           <div className={`${styles.header} d-flex flex-row align-items-center justify-content-between`}>
             <figure className={`${styles.score}`}>
-              <img className={styles.coin} src={Coin} draggable={`false`} />
-              <figcaption>{score}</figcaption>
+              <img src={Coin} draggable={`false`} />
+              <figcaption>
+                <span className="score">{score}</span>
+              </figcaption>
             </figure>
 
             <div className={styles.timer}>
-              <span>{timer}</span>.<small className="milisecond">{0}</small>
+              <span>{timer}</span>
             </div>
           </div>
 
           <div id={`tongue`} className={styles.tongue}></div>
-          <figure>
-            <img className={styles.frog} src={Efrog} draggable={`false`} />
+
+          <figure className={styles.frog}>
+            <img src={Efrog} draggable={`false`} />
           </figure>
         </div>
-        <ul className={`${styles.nav} d-flex`}>
-          <li
-            onClick={() => {
-              playClick()
-              navigate(`/`)
-            }}
-          />
-          <li
-            onClick={() => {
-              playClick()
-              navigate(`/pools`)
-            }}
-          />
-          <li
-            onClick={() => {
-              playClick()
-            }}
-          />
-        </ul>
       </section>
     </>
   )
