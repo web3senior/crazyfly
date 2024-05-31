@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@metamask/detect-provider": "^2.0.0",
     "animate.css": "^4.1.1",
     "office-ui-fabric-core": "^11.1.0",
     "party-js": "^2.2.0",

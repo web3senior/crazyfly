@@ -6,7 +6,8 @@ import Shimmer from './helper/Shimmer'
 import Loading from './components/LoadingSpinner'
 import { CheckIcon, ChromeIcon, BraveIcon } from './components/icons'
 import toast, { Toaster } from 'react-hot-toast'
-import { useAuth, web3, _ } from '../contexts/AuthContext'
+import { useAuth } from '../contexts/AuthContext'
+import { newRecord } from './../util/api'
 import styles from './Play.module.scss'
 import Web3 from 'web3'
 import ABI from '../abi/luckybet.json'
@@ -160,7 +161,18 @@ function Play({ title }) {
       navigator.vibrate(200)
     }
   }
-
+    const showScore = () => {
+      let score = document.querySelector(`.score-input`).value
+      setGameover(true)
+      
+      newRecord({
+        wallet_addr: localStorage.getItem(`wallet`),
+        score: score,
+        level_number: 1,
+      })
+      alert(`Your Score: ${score}`)
+      window.location.href = `../`
+    }
   useEffect(() => {
     addFly(50)
 
@@ -185,11 +197,6 @@ function Play({ title }) {
     document.onmouseup = (e) => handleTongueBack(e, tongueProperty)
     document.ontouchcancel = (e) => handleTongueBack(e, tongueProperty)
 
-    const showScore = () => {
-      setGameover(true)
-      alert(`Your Score: ${document.querySelector(`.score-input`).value}`)
-      window.location.href = `../`
-    }
 
     const Interval = window.setInterval(() => {
       console.log(timer)

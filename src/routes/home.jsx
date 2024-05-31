@@ -4,9 +4,10 @@ import { Title } from './helper/DocumentTitle'
 import MaterialIcon from './helper/MaterialIcon'
 import Shimmer from './helper/Shimmer'
 import toast, { Toaster } from 'react-hot-toast'
-import { useAuth, web3, _ } from './../contexts/AuthContext'
+import { useAuth } from './../contexts/AuthContext'
 import Logo from './../../src/assets/logo.svg'
 import Aratta from './../../src/assets/aratta.svg'
+import { getLeaderboard } from './../util/api'
 import Luckybet from './../../src/assets/luckybet.svg'
 import Slogan from './../../src/assets/slogan.svg'
 import Web3 from 'web3'
@@ -14,11 +15,6 @@ import ABI from '../abi/luckybet.json'
 import party from 'party-js'
 import DappDefaultIcon from './../assets/dapp-default-icon.svg'
 import styles from './Home.module.scss'
-
-party.resolvableShapes['UP'] = `<img src="http://localhost:5173/src/assets/up-logo.svg"/>`
-party.resolvableShapes['Lukso'] = `<img src="http://localhost:5173/src/assets/lukso-logo.svg"/>`
-
-const WhitelistFactoryAddr = web3.utils.padLeft(`0x2`, 64)
 
 export const loader = async () => {
   return defer({ key: 'val' })
@@ -28,8 +24,8 @@ function Home({ title }) {
   Title(title)
   const [loaderData, setLoaderData] = useState(useLoaderData())
   const [isLoading, setIsLoading] = useState(true)
-  const [app, setApp] = useState([])
-  const [backApp, setBackupApp] = useState([])
+  const [wallet, setWallet] = useState('')
+  const [leaderboard, setLeaderboard] = useState([])
   const [whitelist, setWhitelist] = useState()
   const [recentApp, setRecentApp] = useState([])
   const [showModal, setShowModal] = useState(false)
@@ -37,131 +33,7 @@ function Home({ title }) {
   const auth = useAuth()
   const navigate = useNavigate()
   const txtSearchRef = useRef()
-
-  const addMe = async () => {
-    const t = toast.loading(`Loading`)
-    try {
-      web3.eth.defaultAccount = auth.wallet
-
-      const whitelistFactoryContract = new web3.eth.Contract(ABI, import.meta.env.VITE_WHITELISTFACTORY_CONTRACT_MAINNET, {
-        from: auth.wallet,
-      })
-      console.log(whitelistFactoryContract.defaultChain, Date.now())
-      await whitelistFactoryContract.methods
-        .addUser(WhitelistFactoryAddr)
-        .send()
-        .then((res) => {
-          console.log(res)
-          toast.dismiss(t)
-          toast.success(`You hav been added to the list.`)
-          party.confetti(document.querySelector(`h4`), {
-            count: party.variation.range(20, 40),
-          })
-        })
-    } catch (error) {
-      console.error(error)
-      toast.dismiss(t)
-    }
-  }
-
-  const addUserByManager = async () => {
-    const t = toast.loading(`Loading`)
-    try {
-      web3.eth.defaultAccount = auth.wallet
-
-      const whitelistFactoryContract = new web3.eth.Contract(ABI, import.meta.env.VITE_WHITELISTFACTORY_CONTRACT_MAINNET, {
-        from: auth.wallet,
-      })
-
-      await whitelistFactoryContract.methods
-        .addUserByManager(WhitelistFactoryAddr)
-        .send()
-        .then((res) => {
-          console.log(res)
-          toast.dismiss(t)
-          toast.success(`You hav been added to the list.`)
-          party.confetti(document.querySelector(`h4`), {
-            count: party.variation.range(20, 40),
-          })
-        })
-    } catch (error) {
-      console.error(error)
-      toast.dismiss(t)
-    }
-  }
-
-  const updateWhitelist = async () => {
-    web3.eth.defaultAccount = `0x188eeC07287D876a23565c3c568cbE0bb1984b83`
-
-    const whitelistFactoryContract = new web3.eth.Contract('', `0xc407722d150c8a65e890096869f8015D90a89EfD`, {
-      from: '0x188eeC07287D876a23565c3c568cbE0bb1984b83', // default from address
-      gasPrice: '20000000000',
-    })
-    console.log(whitelistFactoryContract.defaultChain, Date.now())
-    await whitelistFactoryContract.methods
-      .updateWhitelist(web3.utils.utf8ToBytes(1), `q1q1q1q1`, false)
-      .send()
-      .then((res) => {
-        console.log(res)
-      })
-  }
-
-  const createWhitelist = async () => {
-    console.log(auth.wallet)
-    web3.eth.defaultAccount = auth.wallet
-
-    const whitelistFactoryContract = new web3.eth.Contract(ABI, import.meta.env.VITE_WHITELISTFACTORY_CONTRACT_MAINNET)
-    await whitelistFactoryContract.methods
-      .addWhitelist(``, Date.now(), 1710102205873, `0x0D5C8B7cC12eD8486E1E0147CC0c3395739F138d`, [])
-      .send({ from: auth.wallet })
-      .then((res) => {
-        console.log(res)
-      })
-  }
-
-  const handleSearch = async () => {
-    let dataFilter = app
-    if (txtSearchRef.current.value !== '') {
-      let filteredData = dataFilter.filter((item) => item.name.toLowerCase().includes(txtSearchRef.current.value.toLowerCase()))
-      if (filteredData.length > 0) setApp(filteredData)
-    } else setApp(backApp)
-  }
-
-  const fetchIPFS = async (CID) => {
-    try {
-      const response = await fetch(`https://api.universalprofile.cloud/ipfs/${CID}`)
-      if (!response.ok) throw new Response('Failed to get data', { status: 500 })
-      const json = await response.json()
-      // console.log(json)
-      return json
-    } catch (error) {
-      console.error(error)
-    }
-
-    return false
-  }
-
-  const getAppList = async () => {
-    let web3 = new Web3(`https://rpc.lukso.gateway.fm`)
-    web3.eth.defaultAccount = auth.wallet
-    const UpstoreContract = new web3.eth.Contract(ABI, import.meta.env.VITE_UPSTORE_CONTRACT_MAINNET)
-    return await UpstoreContract.methods.getAppList().call()
-  }
-
-  const getLike = async (appId) => {
-    let web3 = new Web3(import.meta.env.VITE_RPC_URL)
-    const UpstoreContract = new web3.eth.Contract(ABI, import.meta.env.VITE_UPSTORE_CONTRACT_MAINNET)
-    return await UpstoreContract.methods.getLikeTotal(appId).call()
-  }
-
-  const handleRemoveRecentApp = async (e, appId) => {
-    localStorage.setItem('appSeen', JSON.stringify(recentApp.filter((reduceItem) => reduceItem.appId !== appId)))
-
-    // Refresh the recent app list
-    getRecentApp().then((res) => {
-      setRecentApp(res)
-    })
-  }
+  console.log(useAuth())
 
   const getRecentApp = async () => {
     return await JSON.parse(localStorage.getItem(`appSeen`))
@@ -171,9 +43,7 @@ function Home({ title }) {
     setShowModal((showModal) => !showModal)
     switch (action) {
       case 'rules':
-        setModalContent(
-          `Goal: Catch as many flies as possible within the specified time limit to climb the leaderboard and become the ultimate fly-catching champion!`
-        )
+        setModalContent(`Goal: Catch as many flies as possible within the specified time limit to climb the leaderboard and become the ultimate fly-catching champion!`)
         break
       case 'about':
         setModalContent(
@@ -207,7 +77,37 @@ Catch flies, collect NFTs, and enjoy the fun and rewarding gameplay.
     }
   }
 
+  async function getAccount() {
+    const accounts = await window.ethereum // Or window.ethereum if you don't support EIP-6963.
+      .request({ method: 'eth_requestAccounts' })
+      .catch((err) => {
+        if (err.code === 4001) {
+          // EIP-1193 userRejectedRequest error.
+          // If this happens, the user rejected the connection request.
+          console.log('Please connect to MetaMask.')
+        } else {
+          console.error(err)
+        }
+      })
+    const account = accounts[0]
+    localStorage.setItem(`wallet`, account)
+    toast.success(`Wallet connected`)
+    setWallet(account)
+    return account
+  }
+
   useEffect(() => {
+    getLeaderboard().then((res) => {
+      console.log(res)
+      setLeaderboard(res)
+    })
+    // if (typeof window.ethereum !== "undefined") {
+    //   console.log("MetaMask is installed!");
+    //   getAccount().then((addr) => {
+    //     console.log(addr)
+    //     setWallet(addr)
+    //   })
+    // }
     // getAppList().then(async (res) => {
     //   const responses = await Promise.all(res[0].map(async (item) => Object.assign(await fetchIPFS(item.metadata), item, { like: web3.utils.toNumber(await getLike(item.id)) })))
     //   setApp(responses.filter((item) => item.status))
@@ -242,11 +142,36 @@ Catch flies, collect NFTs, and enjoy the fun and rewarding gameplay.
 
         <div className={`__container h-inherit d-flex flex-column align-items-center justify-content-center`} data-width={`large`}>
           <nav className={`d-flex flex-column align-items-center justify-content-center`}>
-          <button onClick={() => auth.connectWallet()}>Connect</button>
-          <button onClick={() => navigate(`/level`)}>Play</button>
+            {!wallet && <button onClick={() => getAccount()}>Connect</button>}
+            {wallet && <button onClick={() => navigate(`/level`)}>Play</button>}
             <button onClick={() => handleShowModal('rules')}>Rules</button>
             <button onClick={() => handleShowModal('guide')}>Guide</button>
             <button onClick={() => handleShowModal('about')}>About</button>
+
+            <div className="card">
+              <div className="card__header">Leaderboard | 10 top users</div>
+              <div className="card__body">
+                <table>
+                  <thead>
+                    <th className="text-left">Wallet</th>
+                    <th>Score</th>
+                  </thead>
+                  <tbody>
+                    {leaderboard &&
+                      leaderboard
+                        .filter((item, i) => i < 10)
+                        .map((item) => {
+                          return (
+                            <tr>
+                              <td>{item.wallet_addr}</td>
+                              <td>{item.score}</td>
+                            </tr>
+                          )
+                        })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </nav>
 
           <Link to={`//aratta.dev`} target={`_blank`}>

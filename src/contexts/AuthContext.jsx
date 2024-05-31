@@ -1,18 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-// import { user } from '../util/api'
-// import { ERC725 } from '@erc725/erc725.js'
-// import lsp3ProfileSchema from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import Web3 from 'web3'
+import detectEthereumProvider from "@metamask/detect-provider";
 
-export const PROVIDER = window.lukso
-export const web3 = new Web3(PROVIDER)
-export const _ = web3.utils._
 
 export const AuthContext = React.createContext()
+
 export function useAuth() {
-  return useContext(AuthContext)
+  useContext(AuthContext)
 }
 
 export const isAuth = async () => await localStorage.getItem('accessToken')
@@ -20,22 +16,14 @@ export const isAuth = async () => await localStorage.getItem('accessToken')
 export const chainID = async () => await web3.eth.getChainId()
 
 export const getIPFS = async (CID) => {
-  //  console.log(CID)
   let requestOptions = {
     method: 'GET',
     redirect: 'follow',
   }
-  const response = await fetch(`https://api.universalprofile.cloud/ipfs/${CID}`, requestOptions)
+  const response = await fetch(`${import.meta.env.VITE_IPFS_GATEWAY}${CID}`, requestOptions)
   if (!response.ok) throw new Response('Failed to get data', { status: 500 })
   return response.json()
 }
-
-/**
- * Fetch Universal Profile
- * @param {address} addr
- * @returns
- */
-
 
 /**
  * Connect wallet
@@ -49,11 +37,10 @@ export const isWalletConnected = async () => {
   }
 }
 
-export const isUPinstalled = () => PROVIDER && PROVIDER.isUniversalProfileExtension
+export const isMetaMaskInstalled = () => PROVIDER && PROVIDER.isMetaMask
 
 export function AuthProvider({ children }) {
   const [wallet, setWallet] = useState(null)
-  const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const location = useLocation()
@@ -73,9 +60,8 @@ export function AuthProvider({ children }) {
       accounts = await web3.eth.getAccounts()
       //console.log(accounts)
       setWallet(accounts[0])
-      fetchProfile(accounts[0]).then((res) => setProfile(res))
       toast.dismiss(loadingToast)
-      toast.success(`UP successfuly connected`)
+      toast.success(`Wallet successfuly connected`)
       navigate(`/`)
       return accounts[0]
     } catch (error) {
@@ -84,25 +70,36 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function getAccount() {
+    const accounts = await window.ethereum // Or window.ethereum if you don't support EIP-6963.
+      .request({ method: "eth_requestAccounts" })
+        .catch((err) => {
+          if (err.code === 4001) {
+            // EIP-1193 userRejectedRequest error.
+            // If this happens, the user rejected the connection request.
+            console.log("Please connect to MetaMask.");
+          } else {
+            console.error(err);
+          }
+        });
+    const account = accounts[0];
+    setWallet(account)
+  return account
+  }
+
   useEffect(() => {
-    // if (isUPinstalled()) {
-    //   isWalletConnected().then((addr) => {
-    //     if (addr !== undefined) {
-    //       setWallet(addr)
-    //       fetchProfile(addr).then((res) => setProfile(res))
-    //     }
-    //   })
-    // }
+    if (typeof window.ethereum !== "undefined") {
+      console.log("MetaMask is installed!");
+      getAccount().then((addr) => {
+        console.log(addr)
+        setWallet(addr)
+      })
+    }    
   }, [])
 
   const value = {
     wallet,
-    setWallet,
-    profile,
-    isUPinstalled,
-    setProfile,
-    isWalletConnected,
-    connectWallet,
+    getAccount,
     logout,
   }
 
