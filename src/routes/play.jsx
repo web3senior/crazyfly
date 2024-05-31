@@ -174,7 +174,7 @@ function Play({ title }) {
       window.location.href = `../`
     }
   useEffect(() => {
-    addFly(30)
+    addFly(50)
 
     let width = 100
     let height = 4
