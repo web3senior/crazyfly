@@ -10,8 +10,7 @@ export default function About({ title }) {
         <div className={`card ms-depth-4 text-justify`}>
           <div className="card__header">{title}</div>
           <div className="card__body">
-            UPstore is built on blockchain technology, which distributes control among a network of computers. This means that there is no single authority that can decide what gets listed in a dapp
-            store.
+            
           </div>
         </div>
       </div>
