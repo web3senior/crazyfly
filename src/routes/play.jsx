@@ -61,7 +61,8 @@ function Play({ title }) {
     document.querySelector(`#tongue`).style.transform = transform
   }
 
-  const handleTongue = (event) => {
+  const handleTongue = (event, tongueProperty) => {
+    handleMouseMove(event,'',tongueProperty)
     // console.log(event.touches ? true:false)
     let tongue = document.querySelector(`#tongue`)
     let mouse = {
@@ -163,23 +164,20 @@ function Play({ title }) {
     tongue.width = width + 'px'
     tongue.height = height + 'px'
 
-    let x = tongue.offsetLeft
-    let y = tongue.offsetTop
-
     let tongueProperty = {
       element: tongue,
-      cx: x - 3,
-      cy: y - 3,
+      cx: tongue.offsetLeft - 3,
+      cy: tongue.offsetTop - 3,
     }
 
     document.onmousemove = (e) => handleMouseMove(e, tongue, tongueProperty)
     document.ontouchmove = (e) => handleMouseMove(e, tongue, tongueProperty)
 
-    document.onmousedown = (e) => handleTongue(e)
-    document.ontouchstart = (e) => handleTongue(e)
+    document.onmousedown = (e) => handleTongue(e, tongueProperty)
+    document.ontouchstart = (e) => handleTongue(e, tongueProperty)
 
-    document.onmouseup = (e) => handleTongueBack(e)
-    document.ontouchcancel = (e) => handleTongueBack(e)
+    document.onmouseup = (e) => handleTongueBack(e, tongueProperty)
+    document.ontouchcancel = (e) => handleTongueBack(e, tongueProperty)
 
     //   document.addEventListener("touchstart", (e) => {
     //     handleTongue(e)
