@@ -1,0 +1,12 @@
+{
+  "description": "CrazyFly is a blockchain game where you control a hungry frog on a mission to catch flies.",
+  "external_url": "https://crazyfly.vercel.app/nft-asset.png",
+  "image": "ipfs://QmQqXgqnwTz8EozREUGrEHCJ9sHUzKuMqp22sGRHp1Yw6j",
+  "name": "CrazyFly",
+  "attributes": [
+    {
+      "trait_type": "Stickiness",
+      "value": "20%"
+    }
+  ]
+}
